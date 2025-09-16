@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/ip_providers.dart';
-import '../providers/api_storage_provider.dart';
 import '../widgets/api_dropdown.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -11,7 +10,6 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ipController = TextEditingController();
-    final apis = ref.watch(apiListProvider);
     final selected = ref.watch(selectedApiProvider);
 
     return Scaffold(

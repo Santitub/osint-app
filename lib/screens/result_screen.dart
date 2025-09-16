@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,29 +62,30 @@ class ResultScreen extends ConsumerWidget {
       );
 
   Future<void> _openMapsOrStore(double lat, double lon) async {
-    // 1. Intentar abrir Google Maps (app)
-    final mapsUri = Uri.parse('geo:$lat,$lon?q=$lat,$lon');
-    final mapsAvailable = await canLaunchUrl(mapsUri);
+    // 1. Intent nativo geo:
+    final intent = AndroidIntent(
+      action: 'action_view',
+      data: 'geo:$lat,$lon?q=$lat,$lon',
+    );
 
-    if (mapsAvailable) {
-      await launchUrl(mapsUri, mode: LaunchMode.externalApplication);
+    final canResolve = await intent.canResolveActivity() ?? false;
+    if (canResolve) {
+      await intent.launch();
       return;
     }
 
-    // 2. Redirigir a Play Store (Android)
-    if (Platform.isAndroid) {
-      const intent = AndroidIntent(
-        action: 'action_view',
-        data: 'market://details?id=com.google.android.apps.maps',
-      );
-      if (await intent.canResolveActivity() ?? false) {
-        await intent.launch();
-        return;
-      }
+    // 2. No hay app que atienda geo: → Play Store
+    const storeIntent = AndroidIntent(
+      action: 'action_view',
+      data: 'market://details?id=com.google.android.apps.maps',
+    );
+    if (await storeIntent.canResolveActivity() ?? false) {
+      await storeIntent.launch();
+      return;
     }
 
-    // 3. Fallback: web
-    final webMaps = Uri.parse('https://maps.google.com/?q=$lat,$lon');
-    await launchUrl(webMaps, mode: LaunchMode.externalApplication);
+    // 3. Último fallback: web
+    final webUri = Uri.https('maps.google.com', '/', {'q': '$lat,$lon'});
+    await launchUrl(webUri, mode: LaunchMode.externalApplication);
   }
 }
