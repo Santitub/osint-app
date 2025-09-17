@@ -16,6 +16,7 @@ dependencies:
   uuid: ^4.0.0
   url_launcher: ^6.2.5
   android_intent_plus: ^6.0.0
+  flutter_windowmanager_plus: ^1.0.1
 
 dev_dependencies:
   flutter_test:

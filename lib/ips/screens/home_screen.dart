@@ -4,17 +4,34 @@ import 'package:go_router/go_router.dart';
 import '../providers/ip_providers.dart';
 import '../widgets/api_dropdown.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ipController = TextEditingController();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final TextEditingController _ipController = TextEditingController();
+
+  @override
+  void dispose() {
+    _ipController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final selected = ref.watch(selectedApiProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('IP OSINT'),
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          tooltip: 'Menú principal',
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+        ),
+        title: const Text('ANALIZAR IPS'),
         actions: [
           IconButton(
             icon: const Icon(Icons.list),
@@ -29,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
             const ApiDropdown(),
             const SizedBox(height: 16),
             TextField(
-              controller: ipController,
+              controller: _ipController, // ← conserva texto
               decoration: const InputDecoration(
                 labelText: 'Dirección IP',
                 hintText: 'Ej: 8.8.8.8',
@@ -42,8 +59,9 @@ class HomeScreen extends ConsumerWidget {
                   ? null
                   : () {
                       ref.read(ipQueryProvider.notifier).state =
-                          ipController.text.trim();
+                          _ipController.text.trim();
                       context.push('/result');
+                      // NO limpiamos el campo
                     },
               icon: const Icon(Icons.search),
               label: const Text('Buscar'),

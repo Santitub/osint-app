@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:osint_app/models/custom_api.dart';
+import '../models/custom_api.dart';
 
 class SecureStorage {
   static const _storage = FlutterSecureStorage();
