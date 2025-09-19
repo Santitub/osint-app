@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
 import 'ips/ips_module.dart';
+import 'domains/domain_menu.dart';
 
 /* ---------------- APP ROOT ---------------- */
 void main() => runApp(
@@ -93,16 +94,23 @@ class _HomeLauncherState extends ConsumerState<HomeLauncher>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final modules = [
-      _Module(
-        label: 'Analizar IPs',
-        icon: Icons.location_on,
-        color: Theme.of(context).colorScheme.primary,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const IpsMenu()),
-        ),
+    _Module(
+      label: 'Analizar IPs',
+      icon: Icons.location_on,
+      color: Theme.of(context).colorScheme.primary,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const IpsMenu()),
       ),
-      // ➜ Añade más botones aquí cuando quieras
-    ];
+    ),
+    _Module(
+      label: 'Analizar Dominios',
+      icon: Icons.language,
+      color: Theme.of(context).colorScheme.tertiary,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => DomainMenu()),
+      ),
+    ),
+  ];
 
     return Scaffold(
       extendBodyBehindAppBar: true,

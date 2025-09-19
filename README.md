@@ -1,41 +1,51 @@
-# 🕵️‍♂️ OSINT-APP 
-> Flutter-powered OSINT tool to geolocate any IP address using multiple configurable providers 🌍
+# 🕵️‍♂️ OSINT-APP  
+> Flutter OSINT tool to geolocate any IP address and scan domains** 🌍🔎
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.19+-blue.svg?logo=flutter)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.19+-blue.svg?logo=flutter)](https://flutter.dev)  
 [![Dart](https://img.shields.io/badge/Dart-3.9+-0175C2.svg?logo=dart)](https://dart.dev)
 
 ---
 
-## 🚀 Features
-* 🔍 **Universal adapter** – works with *any* REST API that returns JSON (just plug the URL)  
-* 🧩 **Provider manager** – add, edit or delete endpoints on-the-fly  
-* 🔐 **Secure storage** – your custom APIs are encrypted via **Android Keystore / iOS Keychain**  
-* 🗺️ **One-tap maps** – opens **Google Maps** (app → Play Store → web fallback)  
-* 🌓 **Dark / Light themes** – adaptive `Material 3` design  
-* 📱 **Offline-first** – defaults ship with **3 free providers** (no key required)  
+## 🚀 Features  
+* 🔍 **Universal adapter** – works with *any* JSON-returning REST API  
+* 🧩 **Provider manager** – add, edit or delete endpoints on the fly (for both **IPs** & **domains**)  
+* 🌐 **New «Domains» module**:
+  - ✨ **DNS-over-HTTPS** (Google) – query A, MX, TXT, NS… records  
+  - 🗂️ **Free WHOIS** – registration data, expiry, name-servers…  
+  - 🛠️ **Visual editor** – create / modify / delete your own DNS or WHOIS APIs  
+* 🔐 **Secure storage** – custom APIs are encrypted with **Android Keystore / iOS Keychain**  
+* 🗺️ **Maps one-tap away** – opens **Google Maps** (app → Play Store → web fallback)  
+* 🌓 **Dark / light themes** – adaptive `Material 3` design  
+* 📱 **Offline-first** – includes **free providers** by default (no key required)  
 
 ---
 
-## 🧪 Supported Providers (pre-loaded)
-| Provider | URL-Template | Auth needed |
-|----------|--------------|-------------|
-| [ip-api.com](http://ip-api.com) | `http://ip-api.com/json/{ip}` | ❌ |
-| [ipinfo.io](https://ipinfo.io) | `https://ipinfo.io/{ip}/json` | ❌ |
-| [freeipapi.com](https://freeipapi.com) | `https://freeipapi.com/api/json/{ip}` | ❌ |
+## 🧪 Pre-loaded providers  
+### IPs  
+| Service | Template | Auth |
+|---------|----------|------|
+| ip-api.com | `http://ip-api.com/json/{ip}` | ❌ |
+| ipinfo.io | `https://ipinfo.io/{ip}/json` | ❌ |
+| freeipapi.com | `https://freeipapi.com/api/json/{ip}` | ❌ |
 
-> 🔧 You can add **paid services** (IPStack, IPRegistry, MaxMind, etc.) by inserting your key in the headers.
+### Domains  
+| Service | Template | Type | Auth |
+|---------|----------|------|------|
+| Google DoH | `https://dns.google/resolve?name={domain}&type=A` | DNS | ❌ |
+| Whois.vu | `https://api.whois.vu/?q={domain}` | WHOIS | ❌ |
+
+> 🔧 Add **your own** endpoints (paid or private) by inserting keys in **JSON headers**.
 
 ---
 
-## 🛠️ Build & Run
+## 🛠️ Build & Run  
+### Requirements  
+* Flutter **3.19+** (`flutter doctor -v`)  
+* Dart **3.9+**  
+* Android Studio / Xcode (latest stable)  
+* Git  
 
-### Prerequisites
-* Flutter **3.19+** (`flutter doctor -v`)
-* Dart **3.9+**
-* Android Studio / Xcode (latest stable)
-* Git
-
-### Clone & Install
+### Clone  
 ```bash
 git clone https://github.com/Santitub/osint-app.git
 cd osint-app
@@ -43,60 +53,60 @@ flutter create .
 flutter pub get
 ```
 
-### Run (debug)
+### Run  
 ```bash
-flutter run --debug
+flutter run --debug   # Android / iOS
+flutter run -d chrome # Web (non-fullscreen)
 ```
 
-### Build release APK
+### Build release APK  
 ```bash
 flutter build apk --release --target-platform android-arm64
 ```
 
 ---
 
-## 🧑‍💻 Custom API Format
-When adding a provider you **must** include the placeholder `{ip}` in the URL.
-
+## 🧑‍💻 Custom API formats  
+### IPs  
 | Field | Example |
 |-------|---------|
-| Name | `MyIPService` |
+| Name | `MyIP` |
 | URL | `https://api.example.com/{ip}?key=xxx` |
-| Headers (JSON) | `{"Authorization": "Bearer YOUR_TOKEN"}` |
+| Headers | `{"X-Token": "abc123"}` |
 
-The JSON response **must** contain **at least one** of the following keys (case-insensitive):
-```
-ip, query, ipAddress → mapped to `IpInfo.ip`
-city, cityName → `IpInfo.city`
-country, countryName → `IpInfo.country`
-isp, org, asnOrganization → `IpInfo.isp / org`
-loc, latitude+longitude → `IpInfo.lat / lon`
-```
-> ✨ Everything else is gracefully ignored.
+### Domains  
+| Field | Example |
+|-------|---------|
+| Name | `MyDoH` |
+| URL | `https://dns.google/resolve?name={domain}&type=MX` |
+| Headers | `{"Authorization": "Bearer TOKEN"}` |
+
+> 🔍 The **mandatory** placeholder is `{ip}` or `{domain}` depending on the module.  
+> The app **auto-adapts** to any JSON response (case-insensitive).
 
 ---
 
-## 📦 Tech Stack
+## 📦 Tech stack  
 | Layer | Package |
 |-------|---------|
-| State-Management | `flutter_riverpod` |
+| State | `flutter_riverpod` |
 | Navigation | `go_router` |
-| HTTP Client | `dio` |
-| Secure Storage | `flutter_secure_storage` |
-| Device Intents | `android_intent_plus`, `url_launcher` |
+| HTTP | `dio` |
+| Secure storage | `flutter_secure_storage` |
+| Intents / URL | `android_intent_plus`, `url_launcher` |
 | UUID | `uuid` |
-| Linting | `flutter_lints` |
+| Lints | `flutter_lints` |
 
 ---
 
-## 🙌 Acknowledgements
-* [ip-api.com](https://ip-api.com) for the generous free tier  
-* [Flutter](https://flutter.dev) & [Riverpod](https://riverpod.dev) communities for awesome docs  
+## 🙌 Credits  
+* [Flutter](https://flutter.dev) & [Riverpod](https://riverpod.dev) communities  
+* Free services: ip-api.com, Google DoH, Whois.vu  
 
 ---
 
 <div align="center">
 
-**⭐ Star** this repo if it helped you **gather intel** faster!
+**⭐ Star the repo** if it helped you investigate IPs & domains faster 😉
 
-</div>
+</div

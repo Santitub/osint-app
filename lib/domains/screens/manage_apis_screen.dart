@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import '../models/custom_api.dart';
+import '../../ips/models/custom_api.dart';
 import '../providers/api_storage_provider.dart';
 
-class ManageApisScreen extends ConsumerWidget {
-  const ManageApisScreen({super.key});
+class ManageDomainApisScreen extends ConsumerWidget {
+  const ManageDomainApisScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final list = ref.watch(apiListProvider);
+    final list = ref.watch(domainApiListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis APIs')),
+      appBar: AppBar(title: const Text('Mis APIs de Dominios')),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _showEditDialog(context, ref),
@@ -35,7 +35,7 @@ class ManageApisScreen extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () =>
-                      ref.read(apiListProvider.notifier).remove(api.id),
+                      ref.read(domainApiListProvider.notifier).remove(api.id),
                 ),
               ],
             ),
@@ -45,16 +45,14 @@ class ManageApisScreen extends ConsumerWidget {
     );
   }
 
-  /* ---------- diálogo con controllers controlados ---------- */
+  /* ---------- diálogo seguro (controllers fuera del builder) ---------- */
   void _showEditDialog(BuildContext context, WidgetRef ref, {CustomApi? api}) {
     final isEdit = api != null;
-    // 1) creamos controllers
     final nameCtrl = TextEditingController(text: api?.name ?? '');
     final urlCtrl = TextEditingController(text: api?.urlTemplate ?? '');
     final headersCtrl =
         TextEditingController(text: jsonEncode(api?.headers ?? {}));
 
-    // 2) mostramos y 3) cuando se cierre limpiamos
     showDialog<bool>(
       context: context,
       builder: (_) => _EditApiDialog(
@@ -64,7 +62,7 @@ class ManageApisScreen extends ConsumerWidget {
         headersCtrl: headersCtrl,
       ),
     ).then((saved) {
-      // >>> descartamos controllers SIEMPRE <<<
+      // limpiar controllers SIEMPRE
       nameCtrl.dispose();
       urlCtrl.dispose();
       headersCtrl.dispose();
@@ -79,9 +77,9 @@ class ManageApisScreen extends ConsumerWidget {
       );
 
       if (isEdit) {
-        ref.read(apiListProvider.notifier).update(newApi);
+        ref.read(domainApiListProvider.notifier).update(newApi);
       } else {
-        ref.read(apiListProvider.notifier).add(newApi);
+        ref.read(domainApiListProvider.notifier).add(newApi);
       }
     });
   }
@@ -97,7 +95,7 @@ class ManageApisScreen extends ConsumerWidget {
   }
 }
 
-/* ---------- widget separado → NADA de controllers aquí ---------- */
+/* ---------- widget interno sin controllers ---------- */
 class _EditApiDialog extends StatelessWidget {
   const _EditApiDialog({
     required this.isEdit,
@@ -125,8 +123,8 @@ class _EditApiDialog extends StatelessWidget {
           TextField(
             controller: urlCtrl,
             decoration: const InputDecoration(
-              labelText: 'URL (usa {ip} como placeholder)',
-              hintText: 'https://ip-api.com/json/{ip}',
+              labelText: 'URL (usa {domain} como placeholder)',
+              hintText: 'https://dns.google/resolve?name={domain}&type=A',
             ),
           ),
           TextField(

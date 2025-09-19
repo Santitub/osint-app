@@ -55,4 +55,11 @@ class ApiListNotifier extends StateNotifier<List<CustomApi>> {
       _ref.read(selectedApiProvider.notifier).state = next;
     }
   }
+
+  Future<void> update(CustomApi updated) async {
+    state = [
+      for (final a in state) if (a.id == updated.id) updated else a,
+    ];
+    await SecureStorage.saveApis(state);
+  }
 }
